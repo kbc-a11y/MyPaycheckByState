@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyPaycheckByState.com - Compare Take-Home Pay Across US States</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Raleway:wght@800;900&display=swap" rel="stylesheet">
+    <style>
+        .no-tax-states-container {
+            overflow: hidden;
+        }
+        .scroll-text {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            animation: scroll 20s linear infinite;
+        }
+        .no-tax-states {
+            margin-right: 20px;
+        }
+        .banner-title {
+            margin-right: 20px;
+        }
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        .theme-switch input {
+            display: none;
+        }
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+        }
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        .theme-switch input:checked + .slider {
+            background-color: #2196F3;
+        }
+        .theme-switch input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .theme-switch input:checked + .slider .fas.fa-sun {
+            display: none;
+        }
+        .theme-switch input:checked + .slider .fas.fa-moon {
+            display: block;
+        }
+        .theme-switch input:not(:checked) + .slider .fas.fa-sun {
+            display: block;
+        }
+        .theme-switch input:not(:checked) + .slider .fas.fa-moon {
+            display: none;
+        }
+        .theme-switch .slider .fas {
+            color: white;
+            position: absolute;
+            top: 6px;
+            transition: .4s;
+        }
+        .theme-switch .slider .fas.fa-sun {
+            left: 10px;
+        }
+        .theme-switch .slider .fas.fa-moon {
+            left: 40px;
+        }
+        .income-input {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Calculating taxes for all states...</p>
+    </div>
+
+    <div class="container-fluid px-4 py-5">
+        <header class="text-center mb-5">
+            <h1 class="main-title">Compare Take-Home Pay Across All U.S. States</h1>
+            <p class="text-muted">Understand how state taxes affect your paycheck</p>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <form id="calculatorForm" class="needs-validation" novalidate>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="section-heading text-center">Calculate Your Take-Home Pay</h2>
+                            <div class="row justify-content-center">
+                                <div class="col-12 col-md-8">
+                                    <div class="mb-4">
+                                        <label for="income" class="form-label fw-semibold mb-3">Enter Your Income Before Taxes</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text">$</span>
+                                            <input type="text" class="form-control" id="income" name="income" 
+                                                   placeholder="Enter amount" required
+                                                   aria-label="Income amount">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold mb-3">Income Period</label>
+                                        <div class="btn-group w-100" role="group" aria-label="Income period selection">
+                                            <input type="radio" class="btn-check" name="incomePeriod" id="annually" value="annually" checked>
+                                            <label class="btn btn-outline-primary" for="annually">Annually</label>
+                                            <input type="radio" class="btn-check" name="incomePeriod" id="monthly" value="monthly">
+                                            <label class="btn btn-outline-primary" for="monthly">Monthly</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            Calculate Take-Home Pay
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="mt-5" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title">Key Findings</h3>
+                            <div id="summary" class="mb-0"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">State-by-State Comparison</h3>
+                            <div class="table-responsive">
+                                <table id="results-table" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>State</th>
+                                            <th class="text-end">Annual Take-Home</th>
+                                            <th class="text-end">Monthly Take-Home</th>
+                                            <th class="text-end">Bi-Weekly Take-Home</th>
+                                            <th class="text-end">Total Tax Rate</th>
+                                            <th class="text-end">Total Taxes Paid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="faq-section py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    What is included in the tax calculation?
+                                </button>
+                            </h3>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Our tax calculator includes both federal and state income taxes. For federal taxes, we use the latest IRS tax brackets and standard deduction. For state taxes, we incorporate each state's specific income tax rates and rules. Note that local taxes and special assessments are not included.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Which states have no income tax?
+                                </button>
+                            </h3>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Eight states have no income tax: Alaska, Florida, Nevada, South Dakota, Tennessee, Texas, Washington, and Wyoming. Additionally, New Hampshire only taxes dividend and interest income, not earned wages.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Why do take-home amounts vary by state?
+                                </button>
+                            </h3>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Take-home pay varies because each state sets its own income tax rates and brackets. Some states have no income tax, while others have rates ranging from less than 1% to over 13%. States also differ in how they calculate taxable income and what deductions they allow.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    How often is the tax data updated?
+                                </button>
+                            </h3>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    We update our tax data annually to reflect the latest federal and state tax rates, brackets, and standard deductions. The current calculations use 2024 tax year data. Keep in mind that tax laws can change during the year.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
