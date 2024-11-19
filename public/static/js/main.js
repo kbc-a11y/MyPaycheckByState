@@ -96,8 +96,14 @@ async function submitForm(states) {
         // Clear existing errors
         document.querySelectorAll('.alert-danger').forEach(alert => alert.remove());
         
+        // Determine if we're in development or production
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const apiEndpoint = isLocalhost ? 'http://localhost:8080/api/calculate' : '/api/calculate';
+        
+        console.log('Using API endpoint:', apiEndpoint); // Debug log
+        
         // Make API call
-        const response = await fetch('/api/calculate', {
+        const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -106,7 +112,9 @@ async function submitForm(states) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('API Error:', errorText); // Debug log
+            throw new Error(`HTTP error! status: ${response.status}\n${errorText}`);
         }
 
         const results = await response.json();

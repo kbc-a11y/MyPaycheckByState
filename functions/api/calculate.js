@@ -1,10 +1,17 @@
 export async function onRequestPost(context) {
   try {
     const request = await context.request.json();
+    console.log('Received request:', request); // Debug log
+    
     const income = parseFloat(request.income);
+    console.log('Parsed income:', income); // Debug log
 
     if (isNaN(income) || income < 0) {
-      return new Response(JSON.stringify({ error: 'Invalid income value' }), {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid income value',
+        received: request.income,
+        parsed: income 
+      }), {
         status: 400,
         headers: {
           'Content-Type': 'application/json',
@@ -15,6 +22,7 @@ export async function onRequestPost(context) {
 
     // Tax calculation logic
     const results = calculateAllStates(income);
+    console.log('Calculation results:', results); // Debug log
 
     return new Response(JSON.stringify(results), {
       headers: {
@@ -23,7 +31,12 @@ export async function onRequestPost(context) {
       },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    console.error('Server error:', error); // Debug log
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error',
+      message: error.message,
+      stack: error.stack 
+    }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
