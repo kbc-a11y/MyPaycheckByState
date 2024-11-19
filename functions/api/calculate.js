@@ -126,8 +126,10 @@ function calculateAllStates(income) {
     const stateTax = income * state.taxRate;
     const totalTax = federalTax + stateTax + ficaTax;
     const takeHome = income - totalTax;
-    const totalTaxRate = ((totalTax / income) * 100);
+    const totalTaxRate = (totalTax / income) * 100;
     const ficaTaxRate = (ficaTax / income) * 100;
+    const federalTaxRatePercent = federalTaxRate * 100;
+    const stateTaxRatePercent = state.taxRate * 100;
 
     return {
       state: state.state,
@@ -140,8 +142,8 @@ function calculateAllStates(income) {
       stateTax: Math.round(stateTax),
       ficaTax: Math.round(ficaTax),
       totalTax: Math.round(totalTax),
-      federalTaxRate: Math.round(federalTaxRate * 1000) / 10,
-      stateTaxRate: Math.round(state.taxRate * 1000) / 10,
+      federalTaxRate: Math.round(federalTaxRatePercent * 10) / 10,
+      stateTaxRate: Math.round(stateTaxRatePercent * 10) / 10,
       ficaTaxRate: Math.round(ficaTaxRate * 10) / 10,
       totalTaxRate: Math.round(totalTaxRate * 10) / 10,
     };
