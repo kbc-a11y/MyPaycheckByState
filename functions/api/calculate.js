@@ -88,13 +88,15 @@ function calculateAllStates(income) {
   ];
 
   const federalTaxRate = calculateFederalTaxRate(income);
+  const ficaTax = calculateFicaTax(income);
   
   return states.map(state => {
     const federalTax = income * federalTaxRate;
     const stateTax = income * state.taxRate;
-    const totalTax = federalTax + stateTax;
+    const totalTax = federalTax + stateTax + ficaTax;
     const takeHome = income - totalTax;
     const totalTaxRate = ((totalTax / income) * 100);
+    const ficaTaxRate = (ficaTax / income) * 100;
 
     return {
       state: state.state,
@@ -105,6 +107,11 @@ function calculateAllStates(income) {
       },
       federalTax: Math.round(federalTax),
       stateTax: Math.round(stateTax),
+      ficaTax: Math.round(ficaTax),
+      totalTax: Math.round(totalTax),
+      federalTaxRate: Math.round(federalTaxRate * 1000) / 10,
+      stateTaxRate: Math.round(state.taxRate * 1000) / 10,
+      ficaTaxRate: Math.round(ficaTaxRate * 10) / 10,
       totalTaxRate: Math.round(totalTaxRate * 10) / 10,
     };
   }).sort((a, b) => b.takeHome.annual - a.takeHome.annual);
@@ -119,4 +126,24 @@ function calculateFederalTaxRate(income) {
   if (income <= 243725) return 0.32;
   if (income <= 609350) return 0.35;
   return 0.37;
+}
+
+function calculateFicaTax(income) {
+  // Social Security tax (6.2% up to wage base)
+  const socialSecurityWageBase = 168600; // 2024 wage base
+  const socialSecurityTaxRate = 0.062;
+  const socialSecurityTax = Math.min(income, socialSecurityWageBase) * socialSecurityTaxRate;
+
+  // Medicare tax (1.45% on all income)
+  const medicareTaxRate = 0.0145;
+  let medicareTax = income * medicareTaxRate;
+
+  // Additional Medicare tax (0.9% on income over threshold)
+  const additionalMedicareTaxThreshold = 200000;
+  const additionalMedicareTaxRate = 0.009;
+  if (income > additionalMedicareTaxThreshold) {
+    medicareTax += (income - additionalMedicareTaxThreshold) * additionalMedicareTaxRate;
+  }
+
+  return socialSecurityTax + medicareTax;
 }

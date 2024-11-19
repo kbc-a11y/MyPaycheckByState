@@ -204,36 +204,16 @@ function displayResults(results, states) {
         // Add rank indicator for top 5 states
         const rankClass = index < 5 ? 'text-success fw-bold' : '';
         
-        // Ensure all tax values are numbers and default to 0 if undefined
-        const federalTax = parseFloat(result.federalTax) || 0;
-        const stateTax = parseFloat(result.stateTax) || 0;
-        const ficaTax = parseFloat(result.ficaTax) || 0;
-        const income = parseFloat(result.income) || 1; // Prevent division by zero
-        
-        console.log('Tax values:', {  // Debug log
-            federalTax,
-            stateTax,
-            ficaTax,
-            income,
-            takeHome: result.takeHome
-        });
-
-        const totalTaxesPaid = federalTax + stateTax + ficaTax;
-        const federalTaxRate = ((federalTax / income) * 100).toFixed(1);
-        const stateTaxRate = ((stateTax / income) * 100).toFixed(1);
-        const ficaTaxRate = ((ficaTax / income) * 100).toFixed(1);
-        const totalTaxRate = ((totalTaxesPaid / income) * 100).toFixed(1);
-
         row.innerHTML = `
             <td class="${rankClass}">${state.name}</td>
             <td class="text-end ${rankClass}">${formatCurrency(result.takeHome.annual)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.monthly)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.biweekly)}</td>
-            <td class="text-end">${federalTaxRate}%</td>
-            <td class="text-end">${ficaTaxRate}%</td>
-            <td class="text-end">${stateTaxRate}%</td>
-            <td class="text-end">${totalTaxRate}%</td>
-            <td class="text-end">${formatCurrency(totalTaxesPaid)}</td>
+            <td class="text-end">${result.federalTaxRate}%</td>
+            <td class="text-end">${result.ficaTaxRate}%</td>
+            <td class="text-end">${result.stateTaxRate}%</td>
+            <td class="text-end">${result.totalTaxRate}%</td>
+            <td class="text-end">${formatCurrency(result.totalTax)}</td>
         `;
         
         tbody.appendChild(row);
