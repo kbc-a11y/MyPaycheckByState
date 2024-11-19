@@ -4,7 +4,9 @@ import pandas as pd
 import numpy as np
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, 
+    static_folder='public/static',
+    template_folder='public')
 CORS(app)  # Enable CORS for all routes
 
 def load_tax_data():
@@ -262,8 +264,8 @@ def get_states():
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
-    return send_from_directory('static', filename)
+    return send_from_directory('public/static', filename)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='127.0.0.1', port=port, debug=True)
