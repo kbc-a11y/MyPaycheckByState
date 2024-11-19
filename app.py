@@ -140,61 +140,7 @@ def calculate():
         if income <= 0:
             return jsonify({'error': 'Invalid income value'}), 400
 
-        # Define state tax rates (same as Cloudflare Function)
-        states = [
-            { 'state': 'AL', 'taxRate': 0.050 },
-            { 'state': 'AK', 'taxRate': 0.000 },
-            { 'state': 'AZ', 'taxRate': 0.045 },
-            { 'state': 'AR', 'taxRate': 0.055 },
-            { 'state': 'CA', 'taxRate': 0.133 },
-            { 'state': 'CO', 'taxRate': 0.044 },
-            { 'state': 'CT', 'taxRate': 0.070 },
-            { 'state': 'DE', 'taxRate': 0.066 },
-            { 'state': 'FL', 'taxRate': 0.000 },
-            { 'state': 'GA', 'taxRate': 0.057 },
-            { 'state': 'HI', 'taxRate': 0.110 },
-            { 'state': 'ID', 'taxRate': 0.058 },
-            { 'state': 'IL', 'taxRate': 0.049 },
-            { 'state': 'IN', 'taxRate': 0.032 },
-            { 'state': 'IA', 'taxRate': 0.060 },
-            { 'state': 'KS', 'taxRate': 0.057 },
-            { 'state': 'KY', 'taxRate': 0.050 },
-            { 'state': 'LA', 'taxRate': 0.042 },
-            { 'state': 'ME', 'taxRate': 0.075 },
-            { 'state': 'MD', 'taxRate': 0.059 },
-            { 'state': 'MA', 'taxRate': 0.050 },
-            { 'state': 'MI', 'taxRate': 0.042 },
-            { 'state': 'MN', 'taxRate': 0.099 },
-            { 'state': 'MS', 'taxRate': 0.050 },
-            { 'state': 'MO', 'taxRate': 0.054 },
-            { 'state': 'MT', 'taxRate': 0.068 },
-            { 'state': 'NE', 'taxRate': 0.069 },
-            { 'state': 'NV', 'taxRate': 0.000 },
-            { 'state': 'NH', 'taxRate': 0.000 },
-            { 'state': 'NJ', 'taxRate': 0.108 },
-            { 'state': 'NM', 'taxRate': 0.059 },
-            { 'state': 'NY', 'taxRate': 0.109 },
-            { 'state': 'NC', 'taxRate': 0.049 },
-            { 'state': 'ND', 'taxRate': 0.029 },
-            { 'state': 'OH', 'taxRate': 0.039 },
-            { 'state': 'OK', 'taxRate': 0.048 },
-            { 'state': 'OR', 'taxRate': 0.099 },
-            { 'state': 'PA', 'taxRate': 0.031 },
-            { 'state': 'RI', 'taxRate': 0.059 },
-            { 'state': 'SC', 'taxRate': 0.070 },
-            { 'state': 'SD', 'taxRate': 0.000 },
-            { 'state': 'TN', 'taxRate': 0.000 },
-            { 'state': 'TX', 'taxRate': 0.000 },
-            { 'state': 'UT', 'taxRate': 0.049 },
-            { 'state': 'VT', 'taxRate': 0.087 },
-            { 'state': 'VA', 'taxRate': 0.057 },
-            { 'state': 'WA', 'taxRate': 0.000 },
-            { 'state': 'WV', 'taxRate': 0.065 },
-            { 'state': 'WI', 'taxRate': 0.075 },
-            { 'state': 'WY', 'taxRate': 0.000 }
-        ]
-
-        # Calculate federal tax rate
+        # Calculate federal tax rate based on income brackets
         def calculate_federal_tax_rate(income):
             if income <= 11600: return 0.10
             if income <= 47150: return 0.12
@@ -206,6 +152,60 @@ def calculate():
 
         federal_tax_rate = calculate_federal_tax_rate(income)
         print(f"Federal tax rate: {federal_tax_rate}")  # Debug log
+
+        # Get states data
+        states = [
+            {'state': 'AL', 'name': 'Alabama'},
+            {'state': 'AK', 'name': 'Alaska'},
+            {'state': 'AZ', 'name': 'Arizona'},
+            {'state': 'AR', 'name': 'Arkansas'},
+            {'state': 'CA', 'name': 'California'},
+            {'state': 'CO', 'name': 'Colorado'},
+            {'state': 'CT', 'name': 'Connecticut'},
+            {'state': 'DE', 'name': 'Delaware'},
+            {'state': 'FL', 'name': 'Florida'},
+            {'state': 'GA', 'name': 'Georgia'},
+            {'state': 'HI', 'name': 'Hawaii'},
+            {'state': 'ID', 'name': 'Idaho'},
+            {'state': 'IL', 'name': 'Illinois'},
+            {'state': 'IN', 'name': 'Indiana'},
+            {'state': 'IA', 'name': 'Iowa'},
+            {'state': 'KS', 'name': 'Kansas'},
+            {'state': 'KY', 'name': 'Kentucky'},
+            {'state': 'LA', 'name': 'Louisiana'},
+            {'state': 'ME', 'name': 'Maine'},
+            {'state': 'MD', 'name': 'Maryland'},
+            {'state': 'MA', 'name': 'Massachusetts'},
+            {'state': 'MI', 'name': 'Michigan'},
+            {'state': 'MN', 'name': 'Minnesota'},
+            {'state': 'MS', 'name': 'Mississippi'},
+            {'state': 'MO', 'name': 'Missouri'},
+            {'state': 'MT', 'name': 'Montana'},
+            {'state': 'NE', 'name': 'Nebraska'},
+            {'state': 'NV', 'name': 'Nevada'},
+            {'state': 'NH', 'name': 'New Hampshire'},
+            {'state': 'NJ', 'name': 'New Jersey'},
+            {'state': 'NM', 'name': 'New Mexico'},
+            {'state': 'NY', 'name': 'New York'},
+            {'state': 'NC', 'name': 'North Carolina'},
+            {'state': 'ND', 'name': 'North Dakota'},
+            {'state': 'OH', 'name': 'Ohio'},
+            {'state': 'OK', 'name': 'Oklahoma'},
+            {'state': 'OR', 'name': 'Oregon'},
+            {'state': 'PA', 'name': 'Pennsylvania'},
+            {'state': 'RI', 'name': 'Rhode Island'},
+            {'state': 'SC', 'name': 'South Carolina'},
+            {'state': 'SD', 'name': 'South Dakota'},
+            {'state': 'TN', 'name': 'Tennessee'},
+            {'state': 'TX', 'name': 'Texas'},
+            {'state': 'UT', 'name': 'Utah'},
+            {'state': 'VT', 'name': 'Vermont'},
+            {'state': 'VA', 'name': 'Virginia'},
+            {'state': 'WA', 'name': 'Washington'},
+            {'state': 'WV', 'name': 'West Virginia'},
+            {'state': 'WI', 'name': 'Wisconsin'},
+            {'state': 'WY', 'name': 'Wyoming'}
+        ]
 
         # Calculate taxes for each state
         results = []
@@ -219,27 +219,27 @@ def calculate():
 
             result = {
                 'state': state['state'],
-                'income': income,
+                'income': float(income),  
                 'takeHome': {
-                    'annual': round(take_home),
-                    'monthly': round(take_home / 12),
-                    'biweekly': round(take_home / 26),
+                    'annual': float(round(take_home)),  
+                    'monthly': float(round(take_home / 12)),
+                    'biweekly': float(round(take_home / 26)),
                 },
-                'federalTax': round(federal_tax),
-                'ficaTax': round(fica_tax),
-                'ficaRate': round(fica_rate * 10) / 10,
-                'stateTax': round(state_tax),
-                'totalTaxRate': round(total_tax_rate * 10) / 10,
+                'federalTax': float(round(federal_tax)),
+                'ficaTax': float(round(fica_tax)),
+                'ficaRate': float(round(fica_rate * 10) / 10),
+                'stateTax': float(round(state_tax)),
+                'totalTaxRate': float(round(total_tax_rate * 10) / 10),
             }
             
-            print(f"State {state['state']} result: {result}")  # Debug log
+            print(f"State {state['state']} result: {result}")  
             results.append(result)
 
         # Sort by take-home pay
         results.sort(key=lambda x: x['takeHome']['annual'], reverse=True)
         
         return jsonify(results)
-        
+
     except Exception as e:
         print(f"Error in calculate endpoint: {str(e)}")
         return jsonify({'error': str(e)}), 500
