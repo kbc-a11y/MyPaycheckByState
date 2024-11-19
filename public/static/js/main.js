@@ -46,8 +46,11 @@ function formatIncomeInput(e) {
 // Fetch states
 async function fetchStates() {
     try {
+        // Use Flask endpoint for local development
         const response = await fetch('/api/states');
-        return await response.json();
+        const data = await response.json();
+        console.log('States Response:', data); // Debug log
+        return data;
     } catch (error) {
         console.error('Error fetching states:', error);
         return [];
@@ -115,6 +118,7 @@ async function submitForm(states) {
 // Calculate taxes
 async function calculateTaxes(income) {
     try {
+        // Use Flask endpoint for local development
         const response = await fetch('/api/calculate', {
             method: 'POST',
             headers: {
@@ -122,7 +126,9 @@ async function calculateTaxes(income) {
             },
             body: JSON.stringify({ income: income })
         });
-        return await response.json();
+        const data = await response.json();
+        console.log('API Response:', data); // Debug log
+        return data;
     } catch (error) {
         console.error('Error calculating taxes:', error);
         return null;

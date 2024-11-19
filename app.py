@@ -116,6 +116,111 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/calculate', methods=['POST'])
+def calculate():
+    try:
+        data = request.get_json()
+        income = float(data.get('income', 0))
+        
+        if income <= 0:
+            return jsonify({'error': 'Invalid income value'}), 400
+
+        # Define state tax rates (same as Cloudflare Function)
+        states = [
+            { 'state': 'AL', 'taxRate': 0.050 },
+            { 'state': 'AK', 'taxRate': 0.000 },
+            { 'state': 'AZ', 'taxRate': 0.045 },
+            { 'state': 'AR', 'taxRate': 0.055 },
+            { 'state': 'CA', 'taxRate': 0.133 },
+            { 'state': 'CO', 'taxRate': 0.044 },
+            { 'state': 'CT', 'taxRate': 0.070 },
+            { 'state': 'DE', 'taxRate': 0.066 },
+            { 'state': 'FL', 'taxRate': 0.000 },
+            { 'state': 'GA', 'taxRate': 0.057 },
+            { 'state': 'HI', 'taxRate': 0.110 },
+            { 'state': 'ID', 'taxRate': 0.058 },
+            { 'state': 'IL', 'taxRate': 0.049 },
+            { 'state': 'IN', 'taxRate': 0.032 },
+            { 'state': 'IA', 'taxRate': 0.060 },
+            { 'state': 'KS', 'taxRate': 0.057 },
+            { 'state': 'KY', 'taxRate': 0.050 },
+            { 'state': 'LA', 'taxRate': 0.042 },
+            { 'state': 'ME', 'taxRate': 0.075 },
+            { 'state': 'MD', 'taxRate': 0.059 },
+            { 'state': 'MA', 'taxRate': 0.050 },
+            { 'state': 'MI', 'taxRate': 0.042 },
+            { 'state': 'MN', 'taxRate': 0.099 },
+            { 'state': 'MS', 'taxRate': 0.050 },
+            { 'state': 'MO', 'taxRate': 0.054 },
+            { 'state': 'MT', 'taxRate': 0.068 },
+            { 'state': 'NE', 'taxRate': 0.069 },
+            { 'state': 'NV', 'taxRate': 0.000 },
+            { 'state': 'NH', 'taxRate': 0.000 },
+            { 'state': 'NJ', 'taxRate': 0.108 },
+            { 'state': 'NM', 'taxRate': 0.059 },
+            { 'state': 'NY', 'taxRate': 0.109 },
+            { 'state': 'NC', 'taxRate': 0.049 },
+            { 'state': 'ND', 'taxRate': 0.029 },
+            { 'state': 'OH', 'taxRate': 0.039 },
+            { 'state': 'OK', 'taxRate': 0.048 },
+            { 'state': 'OR', 'taxRate': 0.099 },
+            { 'state': 'PA', 'taxRate': 0.031 },
+            { 'state': 'RI', 'taxRate': 0.059 },
+            { 'state': 'SC', 'taxRate': 0.070 },
+            { 'state': 'SD', 'taxRate': 0.000 },
+            { 'state': 'TN', 'taxRate': 0.000 },
+            { 'state': 'TX', 'taxRate': 0.000 },
+            { 'state': 'UT', 'taxRate': 0.049 },
+            { 'state': 'VT', 'taxRate': 0.087 },
+            { 'state': 'VA', 'taxRate': 0.057 },
+            { 'state': 'WA', 'taxRate': 0.000 },
+            { 'state': 'WV', 'taxRate': 0.065 },
+            { 'state': 'WI', 'taxRate': 0.075 },
+            { 'state': 'WY', 'taxRate': 0.000 }
+        ]
+
+        # Calculate federal tax rate
+        def calculate_federal_tax_rate(income):
+            if income <= 11600: return 0.10
+            if income <= 47150: return 0.12
+            if income <= 100525: return 0.22
+            if income <= 191950: return 0.24
+            if income <= 243725: return 0.32
+            if income <= 609350: return 0.35
+            return 0.37
+
+        federal_tax_rate = calculate_federal_tax_rate(income)
+        
+        # Calculate taxes for each state
+        results = []
+        for state in states:
+            federal_tax = income * federal_tax_rate
+            state_tax = income * state['taxRate']
+            total_tax = federal_tax + state_tax
+            take_home = income - total_tax
+            total_tax_rate = (total_tax / income) * 100
+
+            results.append({
+                'state': state['state'],
+                'takeHome': {
+                    'annual': round(take_home),
+                    'monthly': round(take_home / 12),
+                    'biweekly': round(take_home / 26),
+                },
+                'federalTax': round(federal_tax),
+                'stateTax': round(state_tax),
+                'totalTaxRate': round(total_tax_rate * 10) / 10,
+            })
+
+        # Sort by take-home pay
+        results.sort(key=lambda x: x['takeHome']['annual'], reverse=True)
+        
+        return jsonify(results)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/calculate', methods=['POST'])
 def calculate_taxes():
     try:
         data = request.json
@@ -158,109 +263,65 @@ def calculate_taxes():
         print(f"Error in calculate_taxes: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    try:
-        print("=== Received calculate request ===")
-        # Get JSON data from request
-        data = request.get_json()
-        print("Request data:", data)
-        
-        if not data:
-            print("Error: No data provided")
-            return jsonify({'error': 'No data provided'}), 400
-
-        # Get and validate income
-        income = data.get('income')
-        if not income:
-            print("Error: Income is required")
-            return jsonify({'error': 'Income is required'}), 400
-
-        try:
-            income = float(str(income).replace(',', ''))
-            if income <= 0:
-                print("Error: Income must be greater than 0")
-                return jsonify({'error': 'Income must be greater than 0'}), 400
-        except ValueError:
-            print("Error: Invalid income format")
-            return jsonify({'error': 'Invalid income format'}), 400
-
-        # Get states list
-        states = data.get('states', [])
-        if not states:
-            print("Error: No states selected")
-            return jsonify({'error': 'No states selected'}), 400
-
-        print(f"Processing request - Income: {income}, States: {states}")
-
-        results = []
-        for state in states:
-            try:
-                # Calculate federal tax
-                federal_tax = calculate_marginal_tax(income, 'Federal')
-                print(f"Federal tax for {state}: {federal_tax}")
-                
-                # Calculate state tax
-                state_tax = calculate_marginal_tax(income, 'State', state)
-                print(f"State tax for {state}: {state_tax}")
-                
-                # Calculate total tax and take-home pay
-                total_tax = federal_tax + state_tax
-                take_home = income - total_tax
-                
-                # Calculate effective tax rate
-                total_tax_rate = (total_tax / income * 100) if income > 0 else 0
-                
-                # Add results for this state
-                result = {
-                    'state': state,
-                    'takeHome': {
-                        'annual': round(take_home, 2),
-                        'monthly': round(take_home / 12, 2),
-                        'biweekly': round(take_home / 26, 2)
-                    },
-                    'federalTax': round(federal_tax, 2),
-                    'stateTax': round(state_tax, 2),
-                    'totalTaxRate': round(total_tax_rate, 1)
-                }
-                print(f"Results for {state}:", result)
-                
-                results.append(result)
-
-            except Exception as e:
-                print(f"Error calculating taxes for {state}: {str(e)}")
-                # Skip this state and continue with others
-                continue
-
-        if not results:
-            print("Error: Failed to calculate taxes for any state")
-            return jsonify({'error': 'Failed to calculate taxes for any state'}), 500
-
-        print(f"Sending response with {len(results)} results")
-        return jsonify(results)
-
-    except Exception as e:
-        print(f"Error in calculate endpoint: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/api/states')
 def get_states():
     try:
         states = [
-            'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
-            'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
-            'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-            'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
-            'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey',
-            'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma',
-            'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee',
-            'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-            'Wisconsin', 'Wyoming'
+            { 'name': 'Alabama', 'abbreviation': 'AL' },
+            { 'name': 'Alaska', 'abbreviation': 'AK' },
+            { 'name': 'Arizona', 'abbreviation': 'AZ' },
+            { 'name': 'Arkansas', 'abbreviation': 'AR' },
+            { 'name': 'California', 'abbreviation': 'CA' },
+            { 'name': 'Colorado', 'abbreviation': 'CO' },
+            { 'name': 'Connecticut', 'abbreviation': 'CT' },
+            { 'name': 'Delaware', 'abbreviation': 'DE' },
+            { 'name': 'Florida', 'abbreviation': 'FL' },
+            { 'name': 'Georgia', 'abbreviation': 'GA' },
+            { 'name': 'Hawaii', 'abbreviation': 'HI' },
+            { 'name': 'Idaho', 'abbreviation': 'ID' },
+            { 'name': 'Illinois', 'abbreviation': 'IL' },
+            { 'name': 'Indiana', 'abbreviation': 'IN' },
+            { 'name': 'Iowa', 'abbreviation': 'IA' },
+            { 'name': 'Kansas', 'abbreviation': 'KS' },
+            { 'name': 'Kentucky', 'abbreviation': 'KY' },
+            { 'name': 'Louisiana', 'abbreviation': 'LA' },
+            { 'name': 'Maine', 'abbreviation': 'ME' },
+            { 'name': 'Maryland', 'abbreviation': 'MD' },
+            { 'name': 'Massachusetts', 'abbreviation': 'MA' },
+            { 'name': 'Michigan', 'abbreviation': 'MI' },
+            { 'name': 'Minnesota', 'abbreviation': 'MN' },
+            { 'name': 'Mississippi', 'abbreviation': 'MS' },
+            { 'name': 'Missouri', 'abbreviation': 'MO' },
+            { 'name': 'Montana', 'abbreviation': 'MT' },
+            { 'name': 'Nebraska', 'abbreviation': 'NE' },
+            { 'name': 'Nevada', 'abbreviation': 'NV' },
+            { 'name': 'New Hampshire', 'abbreviation': 'NH' },
+            { 'name': 'New Jersey', 'abbreviation': 'NJ' },
+            { 'name': 'New Mexico', 'abbreviation': 'NM' },
+            { 'name': 'New York', 'abbreviation': 'NY' },
+            { 'name': 'North Carolina', 'abbreviation': 'NC' },
+            { 'name': 'North Dakota', 'abbreviation': 'ND' },
+            { 'name': 'Ohio', 'abbreviation': 'OH' },
+            { 'name': 'Oklahoma', 'abbreviation': 'OK' },
+            { 'name': 'Oregon', 'abbreviation': 'OR' },
+            { 'name': 'Pennsylvania', 'abbreviation': 'PA' },
+            { 'name': 'Rhode Island', 'abbreviation': 'RI' },
+            { 'name': 'South Carolina', 'abbreviation': 'SC' },
+            { 'name': 'South Dakota', 'abbreviation': 'SD' },
+            { 'name': 'Tennessee', 'abbreviation': 'TN' },
+            { 'name': 'Texas', 'abbreviation': 'TX' },
+            { 'name': 'Utah', 'abbreviation': 'UT' },
+            { 'name': 'Vermont', 'abbreviation': 'VT' },
+            { 'name': 'Virginia', 'abbreviation': 'VA' },
+            { 'name': 'Washington', 'abbreviation': 'WA' },
+            { 'name': 'West Virginia', 'abbreviation': 'WV' },
+            { 'name': 'Wisconsin', 'abbreviation': 'WI' },
+            { 'name': 'Wyoming', 'abbreviation': 'WY' }
         ]
         return jsonify(states)
     except Exception as e:
-        print(f"Error in get_states endpoint: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        print(f"Error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
