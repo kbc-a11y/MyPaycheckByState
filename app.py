@@ -226,7 +226,7 @@ def calculate():
         results = []
         for state in states:
             federal_tax = income * federal_tax_rate
-            state_tax = income * state['taxRate']
+            state_tax = calculate_marginal_tax(income, 'State', state['state'])
             fica_tax, fica_rate = calculate_fica_tax(income)
             total_tax = federal_tax + state_tax + fica_tax
             take_home = income - total_tax
@@ -242,7 +242,7 @@ def calculate():
                 },
                 'federalTax': round(federal_tax),
                 'ficaTax': round(fica_tax),
-                'ficaRate': round(fica_rate * 10) / 10,  # Round to 1 decimal place
+                'ficaRate': round(fica_rate * 10) / 10,
                 'stateTax': round(state_tax),
                 'totalTaxRate': round(total_tax_rate * 10) / 10,
             })
@@ -253,8 +253,8 @@ def calculate():
         return jsonify(results)
         
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+        print(f"Error in calculate endpoint: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/calculate', methods=['POST'])
 def calculate_taxes():

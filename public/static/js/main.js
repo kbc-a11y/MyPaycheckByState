@@ -189,6 +189,7 @@ function displayResults(results, states) {
         const federalTaxRate = (result.federalTax / result.income * 100).toFixed(1);
         const stateTaxRate = (result.stateTax / result.income * 100).toFixed(1);
         const ficaTaxRate = (result.ficaTax / result.income * 100).toFixed(1);
+        const totalTaxRate = ((totalTaxesPaid / result.income) * 100).toFixed(1);
 
         row.innerHTML = `
             <td class="${rankClass}">${state.name}</td>
@@ -198,7 +199,7 @@ function displayResults(results, states) {
             <td class="text-end">${federalTaxRate}%</td>
             <td class="text-end">${ficaTaxRate}%</td>
             <td class="text-end">${stateTaxRate}%</td>
-            <td class="text-end">${result.totalTaxRate.toFixed(1)}%</td>
+            <td class="text-end">${totalTaxRate}%</td>
             <td class="text-end">${formatCurrency(totalTaxesPaid)}</td>
         `;
         
