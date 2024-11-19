@@ -185,11 +185,17 @@ function displayResults(results, states) {
         // Add rank indicator for top 5 states
         const rankClass = index < 5 ? 'text-success fw-bold' : '';
         
-        const totalTaxesPaid = parseFloat(result.federalTax) + parseFloat(result.stateTax) + parseFloat(result.ficaTax);
-        const federalTaxRate = (result.federalTax / result.income * 100).toFixed(1);
-        const stateTaxRate = (result.stateTax / result.income * 100).toFixed(1);
-        const ficaTaxRate = (result.ficaTax / result.income * 100).toFixed(1);
-        const totalTaxRate = ((totalTaxesPaid / result.income) * 100).toFixed(1);
+        // Ensure all tax values are numbers and default to 0 if undefined
+        const federalTax = parseFloat(result.federalTax) || 0;
+        const stateTax = parseFloat(result.stateTax) || 0;
+        const ficaTax = parseFloat(result.ficaTax) || 0;
+        const income = parseFloat(result.income) || 1; // Prevent division by zero
+        
+        const totalTaxesPaid = federalTax + stateTax + ficaTax;
+        const federalTaxRate = ((federalTax / income) * 100).toFixed(1);
+        const stateTaxRate = ((stateTax / income) * 100).toFixed(1);
+        const ficaTaxRate = ((ficaTax / income) * 100).toFixed(1);
+        const totalTaxRate = ((totalTaxesPaid / income) * 100).toFixed(1);
 
         row.innerHTML = `
             <td class="${rankClass}">${state.name}</td>
