@@ -1,6 +1,9 @@
 export async function onRequestPost(context) {
+  console.log('Request method:', context.request.method);
+
   // Handle CORS preflight request
   if (context.request.method === "OPTIONS") {
+    console.log('Handling OPTIONS request');
     return new Response(null, {
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -13,12 +16,13 @@ export async function onRequestPost(context) {
 
   try {
     const request = await context.request.json();
-    console.log('Received request:', request); // Debug log
+    console.log('Received request:', JSON.stringify(request)); // Debug log
     
     const income = parseFloat(request.income);
     console.log('Parsed income:', income); // Debug log
 
     if (isNaN(income) || income < 0) {
+      console.log('Invalid income value:', income);
       return new Response(JSON.stringify({ 
         error: 'Invalid income value',
         received: request.income,
@@ -36,9 +40,30 @@ export async function onRequestPost(context) {
 
     // Tax calculation logic
     const results = calculateAllStates(income);
-    console.log('Calculation results:', results); // Debug log
+    console.log('Sample result (first state):', JSON.stringify(results[0])); // Log first state result
+    console.log('Number of results:', results.length); // Log number of results
 
-    return new Response(JSON.stringify(results), {
+    // Validate results before sending
+    if (!Array.isArray(results)) {
+      console.error('Results is not an array:', results);
+      throw new Error('Invalid calculation results');
+    }
+
+    // Ensure all required fields are present
+    const firstResult = results[0];
+    if (!firstResult || typeof firstResult.federalTaxRate !== 'number' || 
+        typeof firstResult.ficaTaxRate !== 'number' || 
+        typeof firstResult.stateTaxRate !== 'number' || 
+        typeof firstResult.totalTaxRate !== 'number') {
+      console.error('Missing required tax rate fields:', firstResult);
+      throw new Error('Invalid tax rate calculations');
+    }
+
+    const responseBody = JSON.stringify(results);
+    console.log('Response body length:', responseBody.length);
+    console.log('Sample of response body:', responseBody.substring(0, 200));
+
+    return new Response(responseBody, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -47,7 +72,7 @@ export async function onRequestPost(context) {
       },
     });
   } catch (error) {
-    console.error('Server error:', error); // Debug log
+    console.error('Server error:', error.message, error.stack); // Debug log
     return new Response(JSON.stringify({ 
       error: 'Internal server error',
       message: error.message,

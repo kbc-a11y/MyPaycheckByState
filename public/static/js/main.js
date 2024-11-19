@@ -111,14 +111,31 @@ async function submitForm(states) {
             body: JSON.stringify({ income: annualIncome })
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
             const errorText = await response.text();
             console.error('API Error:', errorText); // Debug log
             throw new Error(`HTTP error! status: ${response.status}\n${errorText}`);
         }
 
-        const results = await response.json();
-        console.log('Received results:', results);  // Debug log
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+
+        let results;
+        try {
+            results = JSON.parse(responseText);
+            console.log('Parsed results:', results);
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+            throw new Error('Invalid response from server');
+        }
+
+        if (!Array.isArray(results)) {
+            console.error('Results is not an array:', results);
+            throw new Error('Invalid response format from server');
+        }
 
         if (results.error) {
             throw new Error(results.error);
