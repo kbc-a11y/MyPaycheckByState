@@ -11,17 +11,31 @@ CORS(app)  # Enable CORS for all routes
 
 def load_tax_data():
     try:
+        # Get the directory containing app.py
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(current_dir, 'csv for income tax data - 2024.csv')
+        
+        print(f"Loading tax data from: {csv_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        
+        # Check if file exists
+        if not os.path.exists(csv_path):
+            print(f"Error: CSV file not found at {csv_path}")
+            return None
+        
         # Read the CSV file
-        df = pd.read_csv('csv for income tax data - 2024.csv')
+        df = pd.read_csv(csv_path)
         
         # Convert numeric columns, handling any formatting issues
         numeric_cols = ['Bracket_min', 'Bracket_max', 'Tax_rate']
         for col in numeric_cols:
             df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', ''), errors='coerce')
         
+        print(f"Successfully loaded tax data with {len(df)} rows")
         return df
     except Exception as e:
         print(f"Error loading tax data: {str(e)}")
+        print(f"Stack trace: ", e.__traceback__)
         return None
 
 # Initial load of tax rates
