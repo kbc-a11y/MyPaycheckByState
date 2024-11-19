@@ -149,7 +149,30 @@ function displayResults(results, states) {
     // Sort results by take-home pay
     results.sort((a, b) => b.takeHome.annual - a.takeHome.annual);
 
-    // Update table
+    // Find the highest and lowest bi-weekly take-home pay
+    const highestBiweekly = Math.max(...results.map(r => r.takeHome.biweekly));
+    const lowestBiweekly = Math.min(...results.map(r => r.takeHome.biweekly));
+    
+    // Update the Key Findings section
+    const keyFindingsBiweekly = document.getElementById('keyFindingsBiweekly');
+    const keyFindingsLowestBiweekly = document.getElementById('keyFindingsLowestBiweekly');
+    keyFindingsBiweekly.textContent = formatCurrency(highestBiweekly);
+    keyFindingsLowestBiweekly.textContent = formatCurrency(lowestBiweekly);
+    
+    // Find the 5 states with highest total tax rate
+    const highestTaxStates = results
+        .sort((a, b) => b.totalTaxRate - a.totalTaxRate)
+        .slice(0, 5);
+    
+    // Update the highest tax states list
+    const highestTaxStatesList = document.getElementById('highestTaxStates');
+    highestTaxStatesList.innerHTML = highestTaxStates
+        .map(result => {
+            const state = states.find(s => s.abbreviation === result.state);
+            return `<li>${state.name} (${result.totalTaxRate.toFixed(1)}% total tax)</li>`;
+        })
+        .join('');
+    
     const tbody = document.querySelector('#results-table tbody');
     tbody.innerHTML = '';
 
@@ -162,13 +185,19 @@ function displayResults(results, states) {
         // Add rank indicator for top 5 states
         const rankClass = index < 5 ? 'text-success fw-bold' : '';
         
-        const totalTaxesPaid = parseFloat(result.federalTax) + parseFloat(result.stateTax);
+        const totalTaxesPaid = parseFloat(result.federalTax) + parseFloat(result.stateTax) + parseFloat(result.ficaTax);
+        const federalTaxRate = (result.federalTax / result.income * 100).toFixed(1);
+        const stateTaxRate = (result.stateTax / result.income * 100).toFixed(1);
+        const ficaTaxRate = (result.ficaTax / result.income * 100).toFixed(1);
 
         row.innerHTML = `
             <td class="${rankClass}">${state.name}</td>
             <td class="text-end ${rankClass}">${formatCurrency(result.takeHome.annual)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.monthly)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.biweekly)}</td>
+            <td class="text-end">${federalTaxRate}%</td>
+            <td class="text-end">${ficaTaxRate}%</td>
+            <td class="text-end">${stateTaxRate}%</td>
             <td class="text-end">${result.totalTaxRate.toFixed(1)}%</td>
             <td class="text-end">${formatCurrency(totalTaxesPaid)}</td>
         `;
@@ -229,6 +258,20 @@ function generateSummary(results, states) {
                         <span class="fw-bold">${formatCurrency(averageTakeHome)}</span>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <p class="mb-2">💸 Highest Bi-Weekly Take-Home Pay</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Across All States</span>
+                        <span id="keyFindingsBiweekly" class="fw-bold"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2">💸 Lowest Bi-Weekly Take-Home Pay</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Across All States</span>
+                        <span id="keyFindingsLowestBiweekly" class="fw-bold"></span>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -246,7 +289,7 @@ function showDetails(result, states) {
     
     modalTitle.textContent = `${state.name} Tax Breakdown`;
     
-    const grossIncome = result.takeHome.annual + result.federalTax + result.stateTax;
+    const grossIncome = result.takeHome.annual + result.federalTax + result.stateTax + result.ficaTax;
     const detailsHTML = `
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -257,6 +300,10 @@ function showDetails(result, states) {
                 <tr>
                     <th>Federal Tax:</th>
                     <td class="text-end text-danger">-${formatCurrency(result.federalTax)}</td>
+                </tr>
+                <tr>
+                    <th>FICA Tax:</th>
+                    <td class="text-end text-danger">-${formatCurrency(result.ficaTax)}</td>
                 </tr>
                 <tr>
                     <th>State Tax:</th>

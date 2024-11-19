@@ -190,23 +190,45 @@ def calculate():
 
         federal_tax_rate = calculate_federal_tax_rate(income)
         
+        # Calculate FICA tax
+        def calculate_fica_tax(income):
+            # Social Security tax (6.2% up to $168,600)
+            ss_limit = 168600
+            ss_tax = min(income, ss_limit) * 0.062
+            
+            # Medicare tax (1.45% on all income)
+            medicare_tax = income * 0.0145
+            
+            # Additional Medicare tax (0.9% on income over $200,000)
+            additional_medicare_limit = 200000
+            additional_medicare_tax = max(0, income - additional_medicare_limit) * 0.009
+            
+            total_fica = ss_tax + medicare_tax + additional_medicare_tax
+            fica_rate = (total_fica / income) * 100
+            
+            return total_fica, fica_rate
+
         # Calculate taxes for each state
         results = []
         for state in states:
             federal_tax = income * federal_tax_rate
             state_tax = income * state['taxRate']
-            total_tax = federal_tax + state_tax
+            fica_tax, fica_rate = calculate_fica_tax(income)
+            total_tax = federal_tax + state_tax + fica_tax
             take_home = income - total_tax
             total_tax_rate = (total_tax / income) * 100
 
             results.append({
                 'state': state['state'],
+                'income': income,
                 'takeHome': {
                     'annual': round(take_home),
                     'monthly': round(take_home / 12),
                     'biweekly': round(take_home / 26),
                 },
                 'federalTax': round(federal_tax),
+                'ficaTax': round(fica_tax),
+                'ficaRate': round(fica_rate * 10) / 10,  # Round to 1 decimal place
                 'stateTax': round(state_tax),
                 'totalTaxRate': round(total_tax_rate * 10) / 10,
             })
@@ -237,13 +259,15 @@ def calculate_taxes():
             # Calculate taxes
             federal_tax = calculate_marginal_tax(annual_income, 'Federal')
             state_tax = calculate_marginal_tax(annual_income, 'State', state)
-            total_tax = federal_tax + state_tax
+            fica_tax, fica_rate = calculate_fica_tax(annual_income)
+            total_tax = federal_tax + state_tax + fica_tax
             after_tax = annual_income - total_tax
             
             # Convert to monthly if needed
             if display_monthly:
                 federal_tax /= 12
                 state_tax /= 12
+                fica_tax /= 12
                 after_tax /= 12
                 display_income = income if is_monthly else income / 12
             else:
@@ -254,6 +278,7 @@ def calculate_taxes():
                 'income': round(display_income, 2),
                 'federal_tax': round(federal_tax, 2),
                 'state_tax': round(state_tax, 2),
+                'fica_tax': round(fica_tax, 2),
                 'after_tax': round(after_tax, 2)
             })
             

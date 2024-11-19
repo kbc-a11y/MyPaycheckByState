@@ -172,7 +172,66 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <h3 class="card-title">Key Findings</h3>
-                            <div id="summary" class="mb-0"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Biggest Paycheck</h3>
+                                            <p class="card-text">
+                                                Your bi-weekly paycheck will be highest in states with no income tax:
+                                            </p>
+                                            <div class="text-center mb-3">
+                                                <span class="display-4" id="keyFindingsBiweekly">$0</span>
+                                                <div class="text-muted">Bi-weekly Take-Home</div>
+                                            </div>
+                                            <p class="card-text">
+                                                You'll get this amount in:
+                                            </p>
+                                            <ul>
+                                                <li>Alaska</li>
+                                                <li>Florida</li>
+                                                <li>Nevada</li>
+                                                <li>New Hampshire</li>
+                                                <li>South Dakota</li>
+                                                <li>Tennessee</li>
+                                                <li>Texas</li>
+                                                <li>Washington</li>
+                                                <li>Wyoming</li>
+                                            </ul>
+                                            <p class="card-text">
+                                                In these states, you'll only pay federal taxes and FICA, maximizing your take-home pay.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Smallest Paycheck</h3>
+                                            <p class="card-text">
+                                                Your bi-weekly paycheck will be lowest in these high-tax states:
+                                            </p>
+                                            <div class="text-center mb-3">
+                                                <span class="display-4" id="keyFindingsLowestBiweekly">$0</span>
+                                                <div class="text-muted">Bi-weekly Take-Home</div>
+                                            </div>
+                                            <p class="card-text">
+                                                States with highest total tax burden:
+                                            </p>
+                                            <ol id="highestTaxStates">
+                                                <li>Loading...</li>
+                                                <li>Loading...</li>
+                                                <li>Loading...</li>
+                                                <li>Loading...</li>
+                                                <li>Loading...</li>
+                                            </ol>
+                                            <p class="card-text">
+                                                These states have higher state income tax rates, resulting in smaller take-home pay.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -187,6 +246,9 @@
                                             <th class="text-end">Annual Take-Home</th>
                                             <th class="text-end">Monthly Take-Home</th>
                                             <th class="text-end">Bi-Weekly Take-Home</th>
+                                            <th class="text-end">Federal Income Tax Rate</th>
+                                            <th class="text-end">FICA Tax</th>
+                                            <th class="text-end">State Income Tax Rate</th>
                                             <th class="text-end">Total Tax Rate</th>
                                             <th class="text-end">Total Taxes Paid</th>
                                         </tr>
@@ -253,6 +315,24 @@
                             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
                                     We update our tax data annually to reflect the latest federal and state tax rates, brackets, and standard deductions. The current calculations use 2024 tax year data. Keep in mind that tax laws can change during the year.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    What is FICA tax & how is it calculated?
+                                </button>
+                            </h3>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>FICA (Federal Insurance Contributions Act) tax is a mandatory payroll tax that funds Social Security and Medicare programs. It consists of three components:</p>
+                                    <ul>
+                                        <li><strong>Social Security tax (6.2%):</strong> This applies to the first $168,600 of your income (2024 limit). Any earnings above this amount are not subject to Social Security tax.</li>
+                                        <li><strong>Medicare tax (1.45%):</strong> This applies to all of your income, with no cap.</li>
+                                        <li><strong>Additional Medicare tax (0.9%):</strong> If your income exceeds $200,000, you'll pay this additional tax on the amount above the threshold.</li>
+                                    </ul>
+                                    <p>For most workers earning under $168,600, the total FICA tax rate is 7.65% (6.2% + 1.45%). Your employer matches this amount, for a total contribution of 15.3%.</p>
                                 </div>
                             </div>
                         </div>
