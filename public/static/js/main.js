@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Initializing application');
         
         // Load states
-        await populateStates();
+        const states = await fetchStates();
         console.log('States loaded:', states);
         
         // Add form submission handler
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             form.addEventListener('submit', async function(e) {
                 console.log('Form submitted');
                 e.preventDefault();
-                await submitForm();
+                await submitForm(states);
             });
         }
 
@@ -43,25 +43,14 @@ function formatIncomeInput(e) {
     }
 }
 
-// Populate states array
-async function populateStates() {
+// Fetch states
+async function fetchStates() {
     try {
         const response = await fetch('/api/states');
-        if (!response.ok) {
-            throw new Error('Failed to fetch states');
-        }
-        
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-            throw new Error('Invalid states data received');
-        }
-        
-        states = data;
-        console.log('States loaded:', states);
-        return states;
+        return await response.json();
     } catch (error) {
         console.error('Error fetching states:', error);
-        showError('Error loading states: ' + error.message);
+        return [];
     }
 }
 
@@ -77,7 +66,7 @@ function showError(message) {
 }
 
 // Form submission
-async function submitForm() {
+async function submitForm(states) {
     console.log('Starting form submission');
     
     try {
@@ -105,26 +94,12 @@ async function submitForm() {
         document.querySelectorAll('.alert-danger').forEach(alert => alert.remove());
         
         // Make API call
-        const response = await fetch('/calculate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                income: annualIncome,
-                states: states
-            })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to calculate taxes');
+        const results = await calculateTaxes(annualIncome);
+        if (!results) {
+            throw new Error('Failed to calculate taxes');
         }
         
-        const results = await response.json();
-        if (!Array.isArray(results) || results.length === 0) {
-            throw new Error('No results received from the server');
-        }
-        
-        displayResults(results);
+        displayResults(results, states);
         
     } catch (error) {
         console.error('Error:', error);
@@ -137,8 +112,25 @@ async function submitForm() {
     }
 }
 
+// Calculate taxes
+async function calculateTaxes(income) {
+    try {
+        const response = await fetch('/api/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ income: income })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error calculating taxes:', error);
+        return null;
+    }
+}
+
 // Display results
-function displayResults(results) {
+function displayResults(results, states) {
     console.log('Displaying results:', results);
     
     // Show results section with animation
@@ -156,6 +148,9 @@ function displayResults(results) {
     tbody.innerHTML = '';
 
     results.forEach((result, index) => {
+        const state = states.find(s => s.abbreviation === result.state);
+        if (!state) return;
+
         const row = document.createElement('tr');
         
         // Add rank indicator for top 5 states
@@ -164,7 +159,7 @@ function displayResults(results) {
         const totalTaxesPaid = parseFloat(result.federalTax) + parseFloat(result.stateTax);
 
         row.innerHTML = `
-            <td class="${rankClass}">${result.state}</td>
+            <td class="${rankClass}">${state.name}</td>
             <td class="text-end ${rankClass}">${formatCurrency(result.takeHome.annual)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.monthly)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.biweekly)}</td>
@@ -175,11 +170,11 @@ function displayResults(results) {
         tbody.appendChild(row);
     });
 
-    generateSummary(results);
+    generateSummary(results, states);
 }
 
 // Generate summary
-function generateSummary(results) {
+function generateSummary(results, states) {
     const summaryDiv = document.getElementById('summary');
     if (!summaryDiv) return;
 
@@ -188,6 +183,9 @@ function generateSummary(results) {
     const difference = highest.takeHome.annual - lowest.takeHome.annual;
     const averageTakeHome = results.reduce((sum, r) => sum + r.takeHome.annual, 0) / results.length;
 
+    const highestState = states.find(s => s.abbreviation === highest.state);
+    const lowestState = states.find(s => s.abbreviation === lowest.state);
+
     const summaryHTML = `
         <div class="mb-4">
             <strong class="d-block mb-3">Key Findings for Your Income:</strong>
@@ -195,7 +193,7 @@ function generateSummary(results) {
                 <div class="col-md-6">
                     <p class="mb-2">🏆 Highest Take-Home Pay</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">${highest.state}</span>
+                        <span class="fw-bold">${highestState.name}</span>
                         <span class="text-success fw-bold">${formatCurrency(highest.takeHome.annual)}</span>
                     </div>
                     <small class="text-muted">${highest.totalTaxRate}% total tax rate</small>
@@ -203,7 +201,7 @@ function generateSummary(results) {
                 <div class="col-md-6">
                     <p class="mb-2">📊 Lowest Take-Home Pay</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">${lowest.state}</span>
+                        <span class="fw-bold">${lowestState.name}</span>
                         <span class="text-danger fw-bold">${formatCurrency(lowest.takeHome.annual)}</span>
                     </div>
                     <small class="text-muted">${lowest.totalTaxRate}% total tax rate</small>
@@ -233,11 +231,14 @@ function generateSummary(results) {
 }
 
 // Show details modal
-function showDetails(result) {
+function showDetails(result, states) {
+    const state = states.find(s => s.abbreviation === result.state);
+    if (!state) return;
+
     const modalBody = document.querySelector('#detailsModal .modal-body');
     const modalTitle = document.querySelector('#detailsModal .modal-title');
     
-    modalTitle.textContent = `${result.state} Tax Breakdown`;
+    modalTitle.textContent = `${state.name} Tax Breakdown`;
     
     const grossIncome = result.takeHome.annual + result.federalTax + result.stateTax;
     const detailsHTML = `
@@ -303,10 +304,6 @@ function formatCurrency(amount) {
         maximumFractionDigits: 0
     }).format(amount);
 }
-
-// Store the current results globally
-let states = [];
-let currentResults = [];
 
 // Dark mode toggle
 const darkModeToggle = document.getElementById('darkMode');
