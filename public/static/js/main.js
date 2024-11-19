@@ -217,6 +217,12 @@ function displayResults(results, states) {
 
     results.forEach((result, index) => {
         console.log('Processing result:', result);  // Debug log for each result
+        console.log('Tax rates for ' + result.state + ':', {
+            federalTaxRate: result.federalTaxRate,
+            ficaTaxRate: result.ficaTaxRate,
+            stateTaxRate: result.stateTaxRate,
+            totalTaxRate: result.totalTaxRate
+        });
         
         const state = states.find(s => s.abbreviation === result.state);
         if (!state) {
@@ -229,15 +235,21 @@ function displayResults(results, states) {
         // Add rank indicator for top 5 states
         const rankClass = index < 5 ? 'text-success fw-bold' : '';
         
+        // Format tax rates with explicit number conversion and fallback
+        const formatTaxRate = (rate) => {
+            const numRate = Number(rate);
+            return isNaN(numRate) ? '0.0%' : numRate.toFixed(1) + '%';
+        };
+        
         row.innerHTML = `
             <td class="${rankClass}">${state.name}</td>
             <td class="text-end ${rankClass}">${formatCurrency(result.takeHome.annual)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.monthly)}</td>
             <td class="text-end">${formatCurrency(result.takeHome.biweekly)}</td>
-            <td class="text-end">${result.federalTaxRate}%</td>
-            <td class="text-end">${result.ficaTaxRate}%</td>
-            <td class="text-end">${result.stateTaxRate}%</td>
-            <td class="text-end">${result.totalTaxRate}%</td>
+            <td class="text-end">${formatTaxRate(result.federalTaxRate)}</td>
+            <td class="text-end">${formatTaxRate(result.ficaTaxRate)}</td>
+            <td class="text-end">${formatTaxRate(result.stateTaxRate)}</td>
+            <td class="text-end">${formatTaxRate(result.totalTaxRate)}</td>
             <td class="text-end">${formatCurrency(result.totalTax)}</td>
         `;
         

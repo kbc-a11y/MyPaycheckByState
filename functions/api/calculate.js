@@ -156,7 +156,21 @@ function calculateAllStates(income) {
     const federalTaxRatePercent = federalTaxRate * 100;
     const stateTaxRatePercent = state.taxRate * 100;
 
-    return {
+    // Debug log for tax calculations
+    console.log(`Tax calculations for ${state.state}:`, {
+      income,
+      federalTax,
+      stateTax,
+      ficaTax,
+      totalTax,
+      takeHome,
+      federalTaxRatePercent,
+      stateTaxRatePercent,
+      ficaTaxRate,
+      totalTaxRate
+    });
+
+    const result = {
       state: state.state,
       takeHome: {
         annual: Math.round(takeHome),
@@ -172,6 +186,11 @@ function calculateAllStates(income) {
       ficaTaxRate: Math.round(ficaTaxRate * 10) / 10,
       totalTaxRate: Math.round(totalTaxRate * 10) / 10,
     };
+
+    // Debug log for result object
+    console.log(`Result object for ${state.state}:`, result);
+
+    return result;
   }).sort((a, b) => b.takeHome.annual - a.takeHome.annual);
 }
 
