@@ -74,15 +74,15 @@ async function submitForm(states) {
     
     try {
         // Get and validate form values
-        const income = document.getElementById('income').value.replace(/[^0-9.]/g, '');
-        const incomePeriod = document.querySelector('input[name="incomePeriod"]:checked').value;
-        
-        if (!income || isNaN(income) || parseFloat(income) <= 0) {
+        const income = parseFloat(document.getElementById('income').value.replace(/[^0-9.]/g, ''));
+        console.log('Submitting income:', income);  // Debug log
+        if (isNaN(income) || income <= 0) {
             throw new Error('Please enter a valid income amount');
         }
         
         // Convert to annual income
-        let annualIncome = parseFloat(income);
+        let annualIncome = income;
+        const incomePeriod = document.querySelector('input[name="incomePeriod"]:checked').value;
         if (incomePeriod === 'monthly') {
             annualIncome *= 12;
         }
@@ -97,9 +97,23 @@ async function submitForm(states) {
         document.querySelectorAll('.alert-danger').forEach(alert => alert.remove());
         
         // Make API call
-        const results = await calculateTaxes(annualIncome);
-        if (!results) {
-            throw new Error('Failed to calculate taxes');
+        const response = await fetch('/api/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ income: annualIncome })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const results = await response.json();
+        console.log('Received results:', results);  // Debug log
+
+        if (results.error) {
+            throw new Error(results.error);
         }
         
         displayResults(results, states);
@@ -137,7 +151,7 @@ async function calculateTaxes(income) {
 
 // Display results
 function displayResults(results, states) {
-    console.log('Displaying results:', results);
+    console.log('Displaying results:', results);  // Debug log
     
     // Show results section with animation
     const resultsSection = document.getElementById('results-section');
@@ -177,8 +191,13 @@ function displayResults(results, states) {
     tbody.innerHTML = '';
 
     results.forEach((result, index) => {
+        console.log('Processing result:', result);  // Debug log for each result
+        
         const state = states.find(s => s.abbreviation === result.state);
-        if (!state) return;
+        if (!state) {
+            console.log('State not found:', result.state);  // Debug log
+            return;
+        }
 
         const row = document.createElement('tr');
         
@@ -191,6 +210,14 @@ function displayResults(results, states) {
         const ficaTax = parseFloat(result.ficaTax) || 0;
         const income = parseFloat(result.income) || 1; // Prevent division by zero
         
+        console.log('Tax values:', {  // Debug log
+            federalTax,
+            stateTax,
+            ficaTax,
+            income,
+            takeHome: result.takeHome
+        });
+
         const totalTaxesPaid = federalTax + stateTax + ficaTax;
         const federalTaxRate = ((federalTax / income) * 100).toFixed(1);
         const stateTaxRate = ((stateTax / income) * 100).toFixed(1);
