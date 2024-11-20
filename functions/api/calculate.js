@@ -179,7 +179,7 @@ function calculateAllStates(income) {
       },
       federalTaxRate: Math.round(federalTaxRate * 10) / 10,
       ficaTaxRate: Math.round(ficaTaxRate * 10) / 10,
-      stateTaxRate: Math.round(stateTaxRate * 10) / 10,
+      stateTaxRate: Math.round(stateTaxRatePercent * 10) / 10,
       totalTaxes: Math.round(totalTax),
       totalTaxRate: Math.round(totalTaxRate * 10) / 10,
     };
