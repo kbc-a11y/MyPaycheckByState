@@ -50,7 +50,7 @@
 
     <div class="container-fluid px-4 py-5">
         <header class="text-center mb-5">
-            <h1 class="main-title">Compare Take-Home Pay Across All U.S. States</h1>
+            <h1 class="main-title">Compare <span class="text-primary">Take-Home Pay</span> Across All U.S. States</h1>
             <p class="text-muted">Understand how state taxes affect your paycheck</p>
         </header>
 
@@ -59,11 +59,11 @@
                 <form id="calculatorForm" class="needs-validation" novalidate>
                     <div class="card">
                         <div class="card-body">
-                            <h2 class="section-heading text-center">Calculate Your Take-Home Pay</h2>
+                            <h2 class="section-heading text-center">Enter your Pre-Tax Pay</h2>
+                            <p class="text-muted text-center mb-4">Exclude taxes, retirement contributions, HSA/FSA...</p>
                             <div class="row justify-content-center">
                                 <div class="col-12 col-md-8">
                                     <div class="mb-4">
-                                        <label for="income" class="form-label fw-semibold mb-3">Enter Your Income Before Taxes</label>
                                         <div class="input-group input-group-lg">
                                             <span class="input-group-text">$</span>
                                             <input type="text" class="form-control" id="income" name="income" 
@@ -73,12 +73,14 @@
                                     </div>
                                     
                                     <div class="mb-4">
-                                        <div class="form-label fw-semibold mb-3" id="incomePeriodLabel">Income Period</div>
+                                        <div class="form-label fw-semibold mb-3 text-center" id="incomePeriodLabel">Income Period</div>
                                         <div class="btn-group w-100" role="group" aria-labelledby="incomePeriodLabel">
                                             <input type="radio" class="btn-check" name="incomePeriod" id="annually" value="annually" checked>
                                             <label class="btn btn-outline-primary" for="annually">Annually</label>
                                             <input type="radio" class="btn-check" name="incomePeriod" id="monthly" value="monthly">
                                             <label class="btn btn-outline-primary" for="monthly">Monthly</label>
+                                            <input type="radio" class="btn-check" name="incomePeriod" id="hourly" value="hourly">
+                                            <label class="btn btn-outline-primary" for="hourly">Hourly</label>
                                         </div>
                                     </div>
                                     

@@ -175,15 +175,12 @@ function calculateAllStates(income) {
       takeHome: {
         annual: Math.round(takeHome),
         monthly: Math.round(takeHome / 12),
-        biweekly: Math.round(takeHome / 26),
+        biweekly: Math.round(takeHome / 26)
       },
-      federalTax: Math.round(federalTax),
-      stateTax: Math.round(stateTax),
-      ficaTax: Math.round(ficaTax),
-      totalTax: Math.round(totalTax),
-      federalTaxRate: Math.round(federalTaxRatePercent * 10) / 10,
-      stateTaxRate: Math.round(stateTaxRatePercent * 10) / 10,
+      federalTaxRate: Math.round(federalTaxRate * 10) / 10,
       ficaTaxRate: Math.round(ficaTaxRate * 10) / 10,
+      stateTaxRate: Math.round(stateTaxRate * 10) / 10,
+      totalTaxes: Math.round(totalTax),
       totalTaxRate: Math.round(totalTaxRate * 10) / 10,
     };
 

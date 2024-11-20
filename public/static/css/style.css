@@ -345,10 +345,10 @@ body {
 
 /* Section Headings */
 .section-heading {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 10rem;
+    font-weight: 900;
     color: var(--text-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     font-family: 'Inter', sans-serif;
 }
 

@@ -248,7 +248,7 @@ def calculate():
                 'federalTax': round(federal_tax),
                 'stateTax': round(state_tax),
                 'ficaTax': round(fica_tax),
-                'totalTax': round(total_tax),
+                'totalTaxes': round(total_tax),
                 'federalTaxRate': round(federal_tax_rate, 1),
                 'stateTaxRate': round(state_tax_rate, 1),
                 'ficaTaxRate': round(fica_rate * 100, 1),
