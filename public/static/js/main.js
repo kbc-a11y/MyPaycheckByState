@@ -252,7 +252,7 @@ function displayResults(results, states) {
             <td class="text-end">${formatTaxRate(result.ficaTaxRate)}</td>
             <td class="text-end">${formatTaxRate(result.stateTaxRate)}</td>
             <td class="text-end">${formatTaxRate(result.totalTaxRate)}</td>
-            <td class="text-end">${formatCurrency(result.totalTax)}</td>
+            <td class="text-end">${formatCurrency(result.totalTaxes)}</td>
         `;
         
         tbody.appendChild(row);
