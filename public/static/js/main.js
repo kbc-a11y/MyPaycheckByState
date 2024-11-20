@@ -98,7 +98,7 @@ async function submitForm(states) {
         
         // Determine if we're in development or production
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiEndpoint = isLocalhost ? 'http://localhost:8080/api/calculate' : 'https://mypaycheck.iangilligan.workers.dev/api/calculate';
+        const apiEndpoint = isLocalhost ? 'http://localhost:8080/api/calculate' : '/api/calculate';
         
         console.log('Using API endpoint:', apiEndpoint); // Debug log
         
