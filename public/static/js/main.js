@@ -1,3 +1,5 @@
+// Version 2.0.0 - Updated API endpoints
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     try {
