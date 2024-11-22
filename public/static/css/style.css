@@ -71,6 +71,7 @@ body {
     font-family: 'Inter', sans-serif;
     color: #111827;
     line-height: 1.5;
+    margin-bottom: 60px; /* Height of the footer */
 }
 
 .container {
@@ -689,13 +690,25 @@ body {
 
 /* Footer Styles */
 .footer {
-    background-color: #f8f9fa;
+    background-color: var(--bg-color);
+    border-top: 1px solid var(--border-color);
     padding: 1rem 0;
     position: relative;
-    margin-top: auto;
+    margin-top: 2rem;
+    width: 100%;
+    bottom: 0;
     font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    color: #4B5563;
+}
+
+.footer p {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 0;
+}
+
+html {
+    min-height: 100%;
+    position: relative;
 }
 
 /* Responsive table */
