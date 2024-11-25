@@ -1,10 +1,155 @@
+/* Base styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: #111827;
+    line-height: 1.5;
+    margin-bottom: 60px;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.main-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+}
+
+/* Form styles */
+.form-control, .input-group-text {
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #e5e7eb;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+/* Loading overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Table styling */
+#results-table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#results-table th {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
+
+#results-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.text-blue {
+    color: #0d6efd !important;  /* Bootstrap primary blue */
+}
+
+.text-gray {
+    color: #6c757d !important;  /* Bootstrap gray-600 */
+}
+
+.text-darker {
+    color: #212529 !important;  /* Bootstrap gray-900 */
+    font-weight: 500;
+}
+
+.text-success {
+    color: #198754 !important;  /* Bootstrap success green */
+}
+
+.fw-normal {
+    font-weight: 400 !important;
+}
+
+/* Card styling */
+.card {
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    font-weight: 500;
+    padding: 0.5rem 2rem;
+    letter-spacing: -0.01em;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+/* FAQ section */
+.faq-section {
+    background-color: #f8fafc;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #f0f9ff;
+    color: #0369a1;
+}
+
+.accordion-button:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+/* Footer */
+.footer {
+    background-color: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+}
+
 /* Dark mode styles */
 :root {
     --bg-color: #ffffff;
     --text-color: #111827;
     --card-bg: #ffffff;
     --border-color: #e5e7eb;
-    --header-bg: #f8fafc;
+    --input-bg: #ffffff;
     --toggle-bg: #f3f4f6;
 }
 
@@ -13,265 +158,39 @@
     --text-color: #e5e7eb;
     --card-bg: #2d2d2d;
     --border-color: #404040;
-    --header-bg: #2d2d2d;
-    --toggle-bg: #404040;
-    --table-header-bg: #333333;
-    --table-header-text: #e5e7eb;
-    --table-cell-bg: #2d2d2d;
-    --table-cell-text: #e5e7eb;
     --input-bg: #333333;
-    --input-text: #e5e7eb;
-    --input-border: #404040;
+    --toggle-bg: #404040;
 }
 
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .input-group-text {
-    background-color: var(--input-bg);
-    border-color: var(--input-border);
-    color: var(--input-text);
-}
-
-[data-theme="dark"] .section-heading {
-    color: var(--text-color);
-}
-
-[data-theme="dark"] .modern-table th {
-    background-color: var(--table-header-bg);
-    color: var(--table-header-text);
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .modern-table td {
-    background-color: var(--table-cell-bg);
-    color: var(--table-cell-text);
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .text-muted {
-    color: #9ca3af !important;
-}
-
-[data-theme="dark"] .take-home-header {
-    background-color: var(--table-header-bg);
-    color: var(--table-header-text);
-}
-
-[data-theme="dark"] .modern-table .amount {
-    color: var(--text-color);
-}
-
-[data-theme="dark"] .modern-table .tax-info .rate {
-    color: #9ca3af;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'Inter', sans-serif;
-    color: #111827;
-    line-height: 1.5;
-    margin-bottom: 60px; /* Height of the footer */
-}
-
-.container {
-    max-width: 1200px;
-}
-
-.card {
-    border: none;
-    border-radius: 10px;
-    overflow: hidden;
+[data-theme="dark"] .card {
     background-color: var(--card-bg);
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--input-bg);
+    color: var(--text-color);
     border-color: var(--border-color);
 }
 
-.card-body {
-    padding: 2rem;
+[data-theme="dark"] .table {
+    color: var(--text-color);
 }
 
-.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+[data-theme="dark"] .modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
 }
 
-.btn-primary {
-    padding: 0.5rem 2rem;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+[data-theme="dark"] .modal-header {
+    border-bottom-color: var(--border-color);
 }
 
-.table-card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    overflow: hidden;
+[data-theme="dark"] .modal-footer {
+    border-top-color: var(--border-color);
 }
 
-/* Table Styles */
-.table {
-    margin-bottom: 0;
-    background-color: var(--background-color);
-}
-
-.table th {
-    padding: 12px;
-    font-weight: 600;
-}
-
-.table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Take-home pay section styles */
-.take-home-section {
-    background-color: var(--primary-color);
-    color: white;
-    border-bottom: none;
-}
-
-.take-home-headers th {
-    color: white !important;
-    font-weight: 500;
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    border-top: none !important;
-    border-bottom: none !important;
-}
-
-.take-home-headers th:not(:first-child):not(:last-child) {
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Table header borders */
-.table thead th {
-    border-bottom: none;
-    background-color: var(--background-color);
-}
-
-.table thead tr:first-child th {
-    border-bottom: none;
-    background-color: var(--background-color);
-}
-
-.table thead tr:first-child th.take-home-section {
-    background-color: var(--primary-color);
-}
-
-.table thead tr:last-child th {
-    border-bottom: 2px solid var(--primary-color);
-}
-
-/* Override for take-home headers */
-.table thead tr.take-home-headers th {
-    background-color: var(--primary-color-dark, #0056b3) !important;
-}
-
-.table thead tr.take-home-headers th:empty {
-    background-color: var(--background-color) !important;
-}
-
-/* Take-home pay cell highlighting */
-.table tbody td:nth-child(2),
-.table tbody td:nth-child(3),
-.table tbody td:nth-child(4) {
-    background-color: rgba(var(--primary-color-rgb), 0.05);
-    font-weight: 500;
-    color: var(--primary-color);
-}
-
-/* Add subtle borders between take-home columns */
-.table tbody td:nth-child(3),
-.table tbody td:nth-child(4) {
-    border-left: 1px solid rgba(var(--primary-color-rgb), 0.1);
-}
-
-/* Hover effect for take-home cells */
-.table tbody tr:hover td:nth-child(2),
-.table tbody tr:hover td:nth-child(3),
-.table tbody tr:hover td:nth-child(4) {
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-}
-
-/* State column styling */
-.table tbody td:first-child {
-    font-weight: 500;
-}
-
-/* Tax columns styling */
-.table tbody td:nth-child(5),
-.table tbody td:nth-child(6),
-.table tbody td:nth-child(7) {
-    color: var(--text-secondary);
-    font-size: 0.95em;
-}
-
-/* Tax info styling */
-.tax-info {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.tax-info small {
-    opacity: 0.7;
-}
-
-/* Scrolling Banner Styles */
-.no-tax-states-container {
-    background: #000000;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    position: relative;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-}
-
-.scroll-text {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    animation: scroll 40s linear infinite;
-    color: #ffffff;
-    font-weight: 500;
-}
-
-.no-tax-states {
-    margin: 0 30px;
-    color: #a0a0a0;
-    font-weight: 500;
-}
-
-.banner-title {
-    margin: 0 30px;
-    color: #ffffff;
-    font-style: italic;
-    font-weight: 600;
-}
-
-.no-tax-states span:not(:last-child)::after {
-    content: " • ";
-    color: #505050;
-    margin: 0 5px;
-}
-
-@keyframes scroll {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-/* Pause animation on hover */
-.no-tax-states-container:hover .scroll-text {
-    animation-play-state: paused;
+[data-theme="dark"] .bg-light {
+    background-color: var(--card-bg) !important;
 }
 
 /* Modern Professional Header */
@@ -284,65 +203,6 @@ body {
 
 [data-theme="dark"] .header-section {
     background-color: var(--bg-color);
-}
-
-.main-title {
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 3.5rem;
-    line-height: 1.1;
-    color: #111827;
-    margin-bottom: 1.5rem;
-    letter-spacing: -0.03em;
-}
-
-[data-theme="dark"] .main-title {
-    color: var(--text-color);
-}
-
-.title-highlight {
-    background: linear-gradient(120deg, #2563eb, #3b82f6);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position: relative;
-    display: inline-block;
-}
-
-[data-theme="dark"] .title-highlight {
-    color: #60a5fa;
-}
-
-.title-accent {
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
-    margin: 1rem auto;
-    border-radius: 2px;
-}
-
-.subtitle {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 1.25rem;
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-}
-
-[data-theme="dark"] .subtitle {
-    color: #9ca3af;
-}
-
-@media (max-width: 768px) {
-    .main-title {
-        font-size: 2.8rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-title {
-        font-size: 2.2rem;
-    }
 }
 
 /* Section Headings */
@@ -361,18 +221,6 @@ body {
 .section-heading.mb-0 {
     margin-bottom: 0 !important;
     white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .section-heading {
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    
-    .d-flex.align-items-center {
-        flex-direction: column;
-        align-items: stretch !important;
-    }
 }
 
 /* Modern Table Styles */
@@ -398,54 +246,10 @@ body {
     cursor: pointer;
 }
 
-.modern-table .take-home-header {
-    padding: 0.5rem 1rem;
-}
-
-.modern-table .header-primary,
-.modern-table .header-secondary {
-    padding: 0.25rem 0;
-    display: block;
-}
-
 .modern-table td {
     padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;
-    text-align: right;
-}
-
-.modern-table .state-name {
-    font-weight: 600;
-    color: #1f2937;
-    text-align: left;
-}
-
-.modern-table .amount {
-    font-weight: 500;
-    color: #1f2937;
-    display: block;
-}
-
-.modern-table .tax-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.modern-table .tax-info .rate {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-top: 0.25rem;
-}
-
-.modern-table .take-home-breakdown {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.modern-table .breakdown-row {
     text-align: right;
 }
 
@@ -580,6 +384,7 @@ body {
 .breakdown-row.biweekly .amount {
     color: #805ad5;
 }
+
 /* FAQ Section Styles */
 .faq-section {
     background-color: var(--bg-color);
@@ -705,11 +510,6 @@ body {
     font-size: 0.9rem;
     color: var(--text-color);
     margin-bottom: 0;
-}
-
-html {
-    min-height: 100%;
-    position: relative;
 }
 
 /* Responsive table */
@@ -1800,48 +1600,4 @@ body {
 #results-table td {
     padding: 0.75rem;
     border-bottom: 1px solid #dee2e6;
-}
-
-/* Card styling */
-.card {
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.card-title {
-    color: #111827;
-    font-weight: 600;
-}
-
-/* Button styling */
-.btn-primary {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-    font-weight: 500;
-}
-
-.btn-primary:hover {
-    background-color: #2563eb;
-    border-color: #2563eb;
-}
-
-/* FAQ section */
-.faq-section {
-    background-color: #f8fafc;
-}
-
-.accordion-button:not(.collapsed) {
-    background-color: #f0f9ff;
-    color: #0369a1;
-}
-
-.accordion-button:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-
-/* Footer */
-.footer {
-    background-color: #f8fafc;
-    border-top: 1px solid #e5e7eb;
 }
