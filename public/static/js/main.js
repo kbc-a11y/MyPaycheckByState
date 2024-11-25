@@ -3,17 +3,13 @@
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        console.log('Initializing application');
-        
         // Load states
         const states = await fetchStates();
-        console.log('States loaded:', states);
         
         // Add form submission handler
         const form = document.getElementById('calculatorForm');
         if (form) {
             form.addEventListener('submit', async function(e) {
-                console.log('Form submitted');
                 e.preventDefault();
                 await submitForm(states);
             });
@@ -24,8 +20,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (incomeInput) {
             incomeInput.addEventListener('input', formatIncomeInput);
         }
-        
-        console.log('Application initialized successfully');
     } catch (error) {
         console.error('Error initializing application:', error);
     }
@@ -48,10 +42,8 @@ function formatIncomeInput(e) {
 // Fetch states
 async function fetchStates() {
     try {
-        // Use Flask endpoint for local development
         const response = await fetch('/api/states');
         const data = await response.json();
-        console.log('States Response:', data); // Debug log
         return data;
     } catch (error) {
         console.error('Error fetching states:', error);
@@ -72,40 +64,26 @@ function showError(message) {
 
 // Form submission
 async function submitForm(states) {
-    console.log('Starting form submission');
-    
     try {
-        // Get and validate form values
         const income = parseFloat(document.getElementById('income').value.replace(/[^0-9.]/g, ''));
-        console.log('Submitting income:', income);  // Debug log
         if (isNaN(income) || income <= 0) {
             throw new Error('Please enter a valid income amount');
         }
         
-        // Convert to annual income
         let annualIncome = income;
         const incomePeriod = document.querySelector('input[name="incomePeriod"]:checked').value;
         if (incomePeriod === 'monthly') {
             annualIncome *= 12;
         }
         
-        // Show loading state
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
             loadingOverlay.style.display = 'flex';
         }
         
-        // Clear existing errors
         document.querySelectorAll('.alert-danger').forEach(alert => alert.remove());
         
-        // Determine if we're in development or production
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiEndpoint = isLocalhost ? 'http://localhost:8080/api/calculate' : '/api/calculate';
-        
-        console.log('Using API endpoint:', apiEndpoint); // Debug log
-        
-        // Make API call
-        const response = await fetch(apiEndpoint, {
+        const response = await fetch('/api/calculate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -113,29 +91,13 @@ async function submitForm(states) {
             body: JSON.stringify({ income: annualIncome })
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error:', errorText); // Debug log
-            throw new Error(`HTTP error! status: ${response.status}\n${errorText}`);
+            throw new Error('Failed to calculate taxes. Please try again.');
         }
 
-        const responseText = await response.text();
-        console.log('Raw response:', responseText);
-
-        let results;
-        try {
-            results = JSON.parse(responseText);
-            console.log('Parsed results:', results);
-        } catch (e) {
-            console.error('Error parsing JSON:', e);
-            throw new Error('Invalid response from server');
-        }
+        const results = await response.json();
 
         if (!Array.isArray(results)) {
-            console.error('Results is not an array:', results);
             throw new Error('Invalid response format from server');
         }
 
@@ -146,7 +108,6 @@ async function submitForm(states) {
         displayResults(results, states);
         
     } catch (error) {
-        console.error('Error:', error);
         showError(error.message || 'An error occurred while calculating taxes');
     } finally {
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -156,103 +117,71 @@ async function submitForm(states) {
     }
 }
 
-// Calculate taxes
-async function calculateTaxes(income) {
-    try {
-        // Use Flask endpoint for local development
-        const response = await fetch('/api/calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ income: income })
-        });
-        const data = await response.json();
-        console.log('API Response:', data); // Debug log
-        return data;
-    } catch (error) {
-        console.error('Error calculating taxes:', error);
-        return null;
-    }
-}
-
 // Display results
 function displayResults(results, states) {
-    console.log('Displaying results:', results);  // Debug log
-    
-    // Show results section with animation
     const resultsSection = document.getElementById('results-section');
     if (resultsSection) {
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Sort results by take-home pay
+    // Sort results by annual take-home pay (highest to lowest)
     results.sort((a, b) => b.takeHome.annual - a.takeHome.annual);
 
-    // Find the highest and lowest bi-weekly take-home pay
+    // Calculate key findings
     const highestBiweekly = Math.max(...results.map(r => r.takeHome.biweekly));
     const lowestBiweekly = Math.min(...results.map(r => r.takeHome.biweekly));
     
-    // Update the Key Findings section
     const keyFindingsBiweekly = document.getElementById('keyFindingsBiweekly');
     const keyFindingsLowestBiweekly = document.getElementById('keyFindingsLowestBiweekly');
-    keyFindingsBiweekly.textContent = formatCurrency(highestBiweekly);
-    keyFindingsLowestBiweekly.textContent = formatCurrency(lowestBiweekly);
+    if (keyFindingsBiweekly) keyFindingsBiweekly.textContent = formatCurrency(highestBiweekly);
+    if (keyFindingsLowestBiweekly) keyFindingsLowestBiweekly.textContent = formatCurrency(lowestBiweekly);
     
-    // Find the 5 states with highest total tax rate
-    const highestTaxStates = results
+    // Display highest tax states
+    const highestTaxStates = [...results]
         .sort((a, b) => b.totalTaxRate - a.totalTaxRate)
         .slice(0, 5);
     
-    // Update the highest tax states list
     const highestTaxStatesList = document.getElementById('highestTaxStates');
-    highestTaxStatesList.innerHTML = highestTaxStates
-        .map(result => {
-            const state = states.find(s => s.abbreviation === result.state);
-            return `<li>${state.name} (${result.totalTaxRate.toFixed(1)}% total tax)</li>`;
-        })
-        .join('');
+    if (highestTaxStatesList) {
+        highestTaxStatesList.innerHTML = highestTaxStates
+            .map(result => {
+                const state = states.find(s => s.abbreviation === result.state);
+                return state ? `<li>${state.name} (${result.totalTaxRate.toFixed(1)}% total tax)</li>` : '';
+            })
+            .join('');
+    }
     
+    // Populate results table
     const tbody = document.querySelector('#results-table tbody');
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
 
-    results.forEach((result, index) => {
-        console.log('Processing result:', result);  // Debug log for each result
-        console.log('Tax rates for ' + result.state + ':', {
-            federalTaxRate: result.federalTaxRate,
-            ficaTaxRate: result.ficaTaxRate,
-            stateTaxRate: result.stateTaxRate,
-            totalTaxRate: result.totalTaxRate
-        });
-        
+    results.forEach(result => {
         const state = states.find(s => s.abbreviation === result.state);
-        if (!state) {
-            console.log('State not found:', result.state);  // Debug log
-            return;
-        }
+        if (!state) return;
 
         const row = document.createElement('tr');
         
-        // Add rank indicator for top 5 states
-        const rankClass = index < 5 ? 'text-success fw-bold' : '';
-        
-        // Format tax rates with explicit number conversion and fallback
         const formatTaxRate = (rate) => {
             const numRate = Number(rate);
             return isNaN(numRate) ? '0.0%' : numRate.toFixed(1) + '%';
         };
         
+        const hasNoIncomeTax = Number(result.stateTaxRate) === 0;
+        const stateNameClass = hasNoIncomeTax ? 'text-success fw-normal' : 'fw-normal';
+        
         row.innerHTML = `
-            <td class="${rankClass}">${state.name}</td>
-            <td class="text-end ${rankClass}">${formatCurrency(result.takeHome.annual)}</td>
-            <td class="text-end">${formatCurrency(result.takeHome.monthly)}</td>
-            <td class="text-end">${formatCurrency(result.takeHome.biweekly)}</td>
-            <td class="text-end">${formatTaxRate(result.federalTaxRate)}</td>
-            <td class="text-end">${formatTaxRate(result.ficaTaxRate)}</td>
-            <td class="text-end">${formatTaxRate(result.stateTaxRate)}</td>
-            <td class="text-end">${formatTaxRate(result.totalTaxRate)}</td>
-            <td class="text-end">${formatCurrency(result.totalTaxes)}</td>
+            <td class="${stateNameClass}">${state.name}${hasNoIncomeTax ? ' (0% Income Tax)' : ''}</td>
+            <td class="text-end text-gray">${formatTaxRate(result.federalTaxRate)}</td>
+            <td class="text-end text-gray">${formatTaxRate(result.ficaTaxRate)}</td>
+            <td class="text-end text-gray">${formatTaxRate(result.stateTaxRate)}</td>
+            <td class="text-end text-darker">${formatTaxRate(result.totalTaxRate)}</td>
+            <td class="text-end text-darker">${formatCurrency(result.totalTaxes)}</td>
+            <td class="text-end text-blue">${formatCurrency(result.takeHome.annual)}</td>
+            <td class="text-end text-blue">${formatCurrency(result.takeHome.monthly)}</td>
+            <td class="text-end text-blue">${formatCurrency(result.takeHome.biweekly)}</td>
         `;
         
         tbody.appendChild(row);
