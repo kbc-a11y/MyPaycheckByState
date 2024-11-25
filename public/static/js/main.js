@@ -174,14 +174,14 @@ function displayResults(results, states) {
         
         row.innerHTML = `
             <td class="${stateNameClass}">${state.name}${hasNoIncomeTax ? ' (0% Income Tax)' : ''}</td>
-            <td class="text-end text-gray">${formatTaxRate(result.federalTaxRate)}</td>
-            <td class="text-end text-gray">${formatTaxRate(result.ficaTaxRate)}</td>
-            <td class="text-end text-gray">${formatTaxRate(result.stateTaxRate)}</td>
-            <td class="text-end text-darker">${formatTaxRate(result.totalTaxRate)}</td>
-            <td class="text-end text-darker">${formatCurrency(result.totalTaxes)}</td>
-            <td class="text-end text-blue">${formatCurrency(result.takeHome.annual)}</td>
-            <td class="text-end text-blue">${formatCurrency(result.takeHome.monthly)}</td>
-            <td class="text-end text-blue">${formatCurrency(result.takeHome.biweekly)}</td>
+            <td class="text-end text-gray fw-normal">${formatTaxRate(result.federalTaxRate)}</td>
+            <td class="text-end text-gray fw-normal">${formatTaxRate(result.ficaTaxRate)}</td>
+            <td class="text-end text-gray fw-normal">${formatTaxRate(result.stateTaxRate)}</td>
+            <td class="text-end text-darker fw-medium">${formatTaxRate(result.totalTaxRate)}</td>
+            <td class="text-end text-darker fw-medium">${formatCurrency(result.totalTaxes)}</td>
+            <td class="text-end text-blue fw-medium">${formatCurrency(result.takeHome.annual)}</td>
+            <td class="text-end text-blue fw-medium">${formatCurrency(result.takeHome.monthly)}</td>
+            <td class="text-end text-blue fw-medium">${formatCurrency(result.takeHome.biweekly)}</td>
         `;
         
         tbody.appendChild(row);
